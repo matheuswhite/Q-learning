@@ -1,7 +1,8 @@
 import os
 from PyGameLearningEnvironment.ple.games import Pong
 from PyGameLearningEnvironment.ple import PLE
-from mtw_agent import MtwAgent
+from pong_agent import PongAgent
+from catcher_agent import CatcherAgent
 
 os.putenv('SDL_VIDEODRIVER', 'fbcon')
 os.environ["SDL_VIDEODRIVER"] = "dummy"
@@ -11,7 +12,8 @@ game = Pong()
 p = PLE(game, fps=30, display_screen=False, force_fps=False)
 p.init()
 
-myAgent = MtwAgent(p.getActionSet(), learning_ratio=0.1)
+# myAgent = PongAgent(p.getActionSet())
+myAgent = CatcherAgent(p.getActionSet())
 
 nb_frames = 1000
 old_reward = 0

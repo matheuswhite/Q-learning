@@ -1,4 +1,5 @@
 from random import random, randint
+from utils import Qfunction, QfunctionRow
 
 
 class PongState:
@@ -18,60 +19,13 @@ class PongState:
                and self.ball_vel_y == other.ball_vel_y
 
 
-class QfunctionRow:
-
-    def __init__(self, state, action, reward):
-        self.state = state
-        self.action = action
-        self.reward = reward
-
-    def __eq__(self, other):
-        return self.state == other.state and self.action == other.action
-
-    def __gt__(self, other):
-        return self.reward > other.reward
-
-    def __lt__(self, other):
-        return self.reward < other.reward
-
-
-class Qfunction:
-
-    def __init__(self, action_set_len, state_set_len):
-        self.table = []
-        self.action_set_len = action_set_len
-        self.state_set_len = state_set_len
-
-    def find_state_action(self, value):
-        for x in range(0, len(self.table)):
-            if value == self.table[x]:
-                return x
-        return None
-
-    def update_expected_return(self, state, action, reward):
-        row = QfunctionRow(state, action, reward)
-        index = self.find_state_action(row)
-        if index is not None:
-            self.table[index].reward = reward
-        else:
-            self.table.append(row)
-
-    def get_expected_return(self, state, action):
-        row = QfunctionRow(state, action, 0)
-        index = self.find_state_action(row)
-        if index is not None:
-            return self.table[index].reward
-        else:
-            return 0
-
-
-class MtwAgent:
+class PongAgent:
 
     def __init__(self, action_set, learning_ratio=0.01, gama=0.5):
         self.action_set = action_set
         self.learning_ratio = learning_ratio
         self.gama = gama
-        self.q_func = Qfunction(len(action_set), 7)
+        self.q_func = Qfunction()
 
     def __choose_best_row(self, state):
         best_row = None
@@ -108,13 +62,3 @@ class MtwAgent:
         equation = current_q_func + self.learning_ratio*(reward + self.gama*next_q_func - current_q_func)
         # print(equation)
         self.q_func.update_expected_return(state, action, equation)
-
-'''
-player_y     48    0
-player_vel  3.6 -3.6
-cpu_y        48    0
-ball_x       64    0
-ball_y       48    0
-ball_vel x   36  -38
-ball_vel_y   36  -36
-'''
