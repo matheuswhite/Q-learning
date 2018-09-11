@@ -10,14 +10,14 @@ if not show_game:
     os.putenv('SDL_VIDEODRIVER', 'fbcon')
     os.environ["SDL_VIDEODRIVER"] = "dummy"
 
-game = Pong()
-# game = Catcher()
+# game = Pong()
+game = Catcher()
 
 p = PLE(game, fps=30, display_screen=show_game, force_fps=not show_game)
 p.init()
 
-myAgent = PongAgent(p.getActionSet(), load_from_file=True, file_name='q_func', learning_ratio=0.001)
-# myAgent = CatcherAgent(p.getActionSet(), load_from_file=True, file_name='q_func')
+# myAgent = PongAgent(p.getActionSet(), load_from_file=True, file_name='q_func', learning_ratio=0.001)
+myAgent = CatcherAgent(p.getActionSet(), load_from_file=True, file_name='q_func')
 
 nb_frames = 1000
 old_reward = 0
@@ -43,6 +43,7 @@ try:
             score = game.getScore()
             if score != old_score and score > 0:
                 print('Score {}'.format(game.getScore()))
+                pass
             old_score = score
             old_reward = reward
             # get next state
