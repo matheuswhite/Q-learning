@@ -15,27 +15,29 @@ self.ball_vel_y = int(state['ball_velocity_y'])
 class PongState:
 
     def __init__(self, state):
-        self.ver_distance = int(state['ball_y']) - int(state['player_y']) + 48
-        self.hor_distance = int(state['ball_x']) + 64
-        self.ball_vel_x = int(state['ball_velocity_y']/2) + 30
+        self.ver_distance = abs(int(state['ball_y']) - int(state['player_y']))
+        self.ver_distance_signal = 1 if int(state['ball_y']) - int(state['player_y']) > 0 else 0
+        self.hor_distance = int(state['ball_x'])
+        self.ball_vel_x = 1 if int(state['ball_velocity_y']) > 0 else 0
 
 
 class PongAgent:
 
-    def __init__(self, action_set, learning_ratio=0.01, gama=0.5, load_from_file=False, file_name=''):
+    def __init__(self, action_set, learning_ratio=0.01, gama=0.5, epsilon=0.01, load_from_file=False, file_name=''):
         self.action_set = action_set
         self.learning_ratio = learning_ratio
         self.gama = gama
+        self.epsilon = epsilon
         if load_from_file:
             self.q_func = np.load(file_name + '_pong.npy')
         else:
-            self.q_func = np.zeros((3, 70, 128, 128))
+            self.q_func = np.zeros((3, 2, 48, 64, 2))
 
     def __get_reward(self, state, action_index: int):
-        return self.q_func[action_index, state.ball_vel_x, state.ver_distance, state.hor_distance]
+        return self.q_func[action_index, state.ball_vel_x, state.ver_distance, state.hor_distance, state.ver_distance_signal]
 
     def __set_reward(self, state, action_index: int, reward):
-        self.q_func[action_index, state.ball_vel_x, state.ver_distance, state.hor_distance] = reward
+        self.q_func[action_index, state.ball_vel_x, state.ver_distance, state.hor_distance, state.ver_distance_signal] = reward
 
     def __choose_best_state_action(self, state):
         best_state = None
@@ -63,7 +65,7 @@ class PongAgent:
 
         best_action = self.__choose_best_state_action(pong_state)
 
-        if random() < self.learning_ratio:
+        if random() < self.epsilon:
             best_action = self.action_set[randint(0, len(self.action_set)-1)]
 
         return best_action
